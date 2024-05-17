@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_bootstrap5',
     'core.apps.CoreConfig',
+    'django_extensions',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -53,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'blogicum.urls'
@@ -142,3 +145,8 @@ CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
 LOGIN_REDIRECT_URL = 'blog:index'
 
 LOGIN_URL = 'login'
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
