@@ -29,7 +29,7 @@ def index(request):
         category__is_published=True
     )[:posts_on_page]
     context = {
-        'post_list': post_list,
+        'page_obj': post_list,
     }
     return render(request, template_name, context)
 
