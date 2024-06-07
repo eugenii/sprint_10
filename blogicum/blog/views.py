@@ -1,10 +1,11 @@
 """Rendering blog pages."""
 from django.shortcuts import render, get_object_or_404
 from blog.models import Category, Post
+from blog.forms import UserForm
 from datetime import datetime
 from django.contrib.auth import get_user_model
 
-
+User = get_user_model()
 posts_on_page = 5
 user_model = get_user_model()
 
@@ -71,14 +72,23 @@ def category_posts(request, category_slug):
 def profile(request, name):
     """Get user's page."""
     template_name = 'blog/profile.html'
-    current_user = request.user
-    # Пример получения email пользователя
-    email = current_user.email
-
+    profile = get_object_or_404(User, username=name)
+    page_obj = Post.objects.filter(author__username=name)
     context = {
-        'titile': f'{current_user.username} page',
-        'test': email,
+        'profile': profile,
+        'page_obj': page_obj,
     }
+
+    return render(request, template_name, context)
+
+
+def edit_profile(request):
+    template_name = 'blog/user.html'
+    # instance = get_object_or_404(User)
+    form = UserForm(request.GET or None)  # request.POST or None, instance=instance
+    context = {'form': form}
+    if form.is_valid():
+        form.save()
     return render(request, template_name, context)
 
 
