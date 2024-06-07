@@ -11,4 +11,4 @@ class UserForm(forms.ModelForm):
         # Указываем модель, на основе которой должна строиться форма.
         model = User
         # Указываем, что надо отобразить все поля.
-        fields = ('first_name', 'last_name')
+        fields = ('first_name', 'last_name', 'username', 'email')

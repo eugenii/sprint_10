@@ -1,5 +1,6 @@
 """Rendering blog pages."""
 from django.shortcuts import render, get_object_or_404
+from django.core.paginator import Paginator
 from blog.models import Category, Post
 from blog.forms import UserForm
 from datetime import datetime
@@ -28,9 +29,13 @@ def index(request):
     template_name = 'blog/index.html'
     post_list = post_filter(
         category__is_published=True
-    )[:posts_on_page]
+    )  # [:posts_on_page]
+    posts = post_list.order_by('id')
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     context = {
-        'page_obj': post_list,
+        'page_obj': page_obj,
     }
     return render(request, template_name, context)
 
@@ -61,10 +66,14 @@ def category_posts(request, category_slug):
     )
     post_list = post_filter(
         category__slug=category_slug
-    )
+    ).order_by('id')
+    paginator = Paginator(post_list, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     context = {
         'post_list': post_list,
         'category': category,
+        'page_obj': page_obj,
     }
     return render(request, template_name, context)
 
@@ -73,7 +82,10 @@ def profile(request, name):
     """Get user's page."""
     template_name = 'blog/profile.html'
     profile = get_object_or_404(User, username=name)
-    page_obj = Post.objects.filter(author__username=name)
+    posts = Post.objects.filter(author__username=name).order_by('id')
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     context = {
         'profile': profile,
         'page_obj': page_obj,
@@ -84,8 +96,8 @@ def profile(request, name):
 
 def edit_profile(request):
     template_name = 'blog/user.html'
-    # instance = get_object_or_404(User)
-    form = UserForm(request.GET or None)  # request.POST or None, instance=instance
+    instance = get_object_or_404(User, id=request.user.id)
+    form = UserForm(request.POST or None, instance=instance)
     context = {'form': form}
     if form.is_valid():
         form.save()
