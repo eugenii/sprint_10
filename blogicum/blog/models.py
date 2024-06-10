@@ -85,7 +85,13 @@ class Post(BaseModel):
         auto_now_add=True,
         verbose_name='Добавлено'
     )
+    image = models.ImageField(
+        'Изображение',
+        upload_to='blog_images',
+        blank=True
+    )
 
     class Meta:
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
+        

@@ -62,6 +62,8 @@ ROOT_URLCONF = 'blogicum.urls'
 
 TEMPLATES_DIR = BASE_DIR / 'templates'
 
+MEDIA_ROOT = BASE_DIR / 'media'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -150,3 +152,4 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
+USE_TZ = False
