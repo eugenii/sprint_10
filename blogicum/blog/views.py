@@ -1,8 +1,9 @@
 """Rendering blog pages."""
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from blog.models import Category, Post
-from blog.forms import UserForm
+from blog.forms import UserForm, PostForm
 from datetime import datetime
 from django.contrib.auth import get_user_model
 
@@ -103,8 +104,23 @@ def edit_profile(request):
         form.save()
     return render(request, template_name, context)
 
-
-def create_post(request):
+@login_required
+def create_post(request, pk=None):
     """Create post by user."""
     template_name = 'blog/create.html'
-    return render(request, template_name)
+    if pk is not None:
+        instance = get_object_or_404(Post, pk=pk)
+    else:
+        instance = None
+    form = PostForm(
+        request.POST or None,
+        files=request.FILES or None,
+        instance=instance
+    )
+    context = {'form': form}
+    if form.is_valid():
+        instance = form.save(commit=False)
+        instance.author = request.user
+        instance.save()
+        return redirect('blog:profile', name=request.user)
+    return render(request, template_name, context)
