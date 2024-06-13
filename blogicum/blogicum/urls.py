@@ -21,6 +21,7 @@ from django.views.generic.edit import CreateView
 from django.conf import settings
 
 urlpatterns = [
+    path("__debug__/", include("debug_toolbar.urls")),
     path('admin/', admin.site.urls),
     path('pages/', include('pages.urls')),
     path('', include('blog.urls')),

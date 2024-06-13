@@ -2,8 +2,8 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from blog.models import Category, Post
-from blog.forms import UserForm, PostForm
+from blog.models import Category, Comment, Post
+from blog.forms import CommentForm, UserForm, PostForm
 from datetime import datetime
 from django.contrib.auth import get_user_model
 
@@ -51,9 +51,12 @@ def post_detail(request, id):
         category__is_published=True,
         pk=id
     )
+    # user = request.user
     context = {
         'post': post,
+        'user': request.user,
     }
+    # print("on page - ", request.username)
     return render(request, template_name, context)
 
 
@@ -124,3 +127,53 @@ def create_post(request, pk=None):
         instance.save()
         return redirect('blog:profile', name=request.user)
     return render(request, template_name, context)
+
+
+def edit_post(request, pk):
+    """Edit post, authered by user."""
+    template_name = 'blog/create.html'
+    instance = get_object_or_404(Post, pk=pk)
+    form = PostForm(request.POST or None, instance=instance)
+    context = {
+        'form': form
+    }
+    if form.is_valid():
+        form.save()
+
+    return render(request, template_name, context)
+
+
+def delete_post(request, id):
+    """Delete post if user is author."""
+    pass
+
+
+@login_required
+def add_comment(request, pk):
+    """Comment post by authenticated user."""
+    template_name = 'blog/comment.html'
+    if pk is not None:
+        instance = get_object_or_404(Comment, pk=pk)
+    else:
+        instance = None
+    form = CommentForm(
+        request.POST or None,
+        instance=instance
+    )
+    context = {'form': form}
+    if form.is_valid():
+        instance = form.save(commit=False)
+        instance.author = request.user
+        instance.save()
+        return redirect('blog:profile', name=request.user)
+    return render(request, template_name, context)
+
+
+def edit_comment(request, id):
+    """Edit post by it's author."""
+    pass
+
+
+def delete_comment(request, id):
+    """Delete post - user is author."""
+    pass

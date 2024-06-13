@@ -1,7 +1,7 @@
 from django import forms
 from django.db import models
 from django.contrib.auth import get_user_model
-from .models import Post
+from .models import Comment, Post
 
 User = get_user_model()
 
@@ -25,3 +25,15 @@ class PostForm(forms.ModelForm):
         }
         # Указываем, что надо отобразить все поля.
         exclude = ('author',)
+
+
+class CommentForm(forms.ModelForm):
+    
+    class Meta:
+        # Указываем модель, на основе которой должна строиться форма.
+        model = Comment
+        widgets = {
+            'pub_date': forms.DateInput(attrs={'type': 'date'})
+        }
+        exclude = ('author',)
+
