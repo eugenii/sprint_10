@@ -51,10 +51,13 @@ def post_detail(request, id):
         category__is_published=True,
         pk=id
     )
-    # user = request.user
+    form = CommentForm(request.POST)
+    comment = Comment.objects.all()
     context = {
         'post': post,
         'user': request.user,
+        'form': form,
+        'comment': comment,
     }
     # print("on page - ", request.username)
     return render(request, template_name, context)
@@ -159,7 +162,35 @@ def delete_post(request, pk):
 @login_required
 def add_comment(request, pk):
     """Comment post by authenticated user."""
-    template_name = 'blog/comment.html'
+    # Получаем объект дня рождения или выбрасываем 404 ошибку.
+    post = get_object_or_404(Post, pk=pk)
+    # Функция должна обрабатывать только POST-запросы.
+    form = CommentForm(request.POST)
+    if form.is_valid():
+        # Создаём объект поздравления, но не сохраняем его в БД.
+        comment = form.save(commit=False)
+        # В поле author передаём объект автора поздравления.
+        post.author = request.user
+        # В поле birthday передаём объект дня рождения.
+        comment.post = post
+        # Сохраняем объект в БД.
+        comment.save()
+    # Перенаправляем пользователя назад, на страницу дня рождения.
+    return redirect('post:detail', pk=pk) 
+
+
+def edit_comment(request, id):
+    """Edit post by it's author."""
+    pass
+
+
+def delete_comment(request, id):
+    """Delete post - user is author."""
+    pass
+
+
+'''
+  template_name = 'blog/comment.html'
     if pk is not None:
         instance = get_object_or_404(Comment, pk=pk)
     else:
@@ -175,13 +206,4 @@ def add_comment(request, pk):
         instance.save()
         return redirect('blog:profile', name=request.user)
     return render(request, template_name, context)
-
-
-def edit_comment(request, id):
-    """Edit post by it's author."""
-    pass
-
-
-def delete_comment(request, id):
-    """Delete post - user is author."""
-    pass
+'''

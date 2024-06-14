@@ -30,10 +30,6 @@ class PostForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     
     class Meta:
-        # Указываем модель, на основе которой должна строиться форма.
         model = Comment
-        widgets = {
-            'pub_date': forms.DateInput(attrs={'type': 'date'})
-        }
-        exclude = ('author',)
+        fields = ('text',) 
 
