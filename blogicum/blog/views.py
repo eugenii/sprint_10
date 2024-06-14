@@ -139,20 +139,21 @@ def edit_post(request, pk):
     }
     if form.is_valid():
         form.save()
+        return redirect('blog:post_detail', id=pk)
 
     return render(request, template_name, context)
 
 
 def delete_post(request, pk):
     """Delete post if user is author."""
+    template_name = 'blog/create.html'
     instance = get_object_or_404(Post, pk=pk)
     form = PostForm(instance=instance)
     context = {'form': form}
-    # name = request.user
     if request.method == 'POST':
         instance.delete()
-        return redirect('blog:profile', name=request.user)
-    return render(request, 'blog/detail.html', context)
+        return redirect('blog:profile', name=request.user)        
+    return render(request, template_name, context)
 
 
 @login_required
