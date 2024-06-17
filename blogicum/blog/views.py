@@ -41,7 +41,7 @@ def index(request):
     return render(request, template_name, context)
 
 
-def post_detail(request, id):
+def post_detail(request, pk):
     """Detailed post."""
     template_name = 'blog/detail.html'
     post = get_object_or_404(
@@ -49,17 +49,16 @@ def post_detail(request, id):
         pub_date__lt=datetime.now(),
         is_published=True,
         category__is_published=True,
-        pk=id
+        pk=pk
     )
     form = CommentForm(request.POST)
-    comment = Comment.objects.all()
+    comment = Comment.objects.filter(post__pk=pk).order_by('created_at')
     context = {
         'post': post,
         'user': request.user,
         'form': form,
-        'comment': comment,
+        'comments': comment,
     }
-    # print("on page - ", request.username)
     return render(request, template_name, context)
 
 
@@ -170,21 +169,21 @@ def add_comment(request, pk):
         # Создаём объект поздравления, но не сохраняем его в БД.
         comment = form.save(commit=False)
         # В поле author передаём объект автора поздравления.
-        post.author = request.user
+        comment.author = request.user
         # В поле birthday передаём объект дня рождения.
         comment.post = post
         # Сохраняем объект в БД.
         comment.save()
     # Перенаправляем пользователя назад, на страницу дня рождения.
-    return redirect('post:detail', pk=pk) 
+    return redirect('blog:post_detail', pk=pk) 
 
 
-def edit_comment(request, id):
+def edit_comment(request, pk, id):
     """Edit post by it's author."""
     pass
 
 
-def delete_comment(request, id):
+def delete_comment(request, pk, id):
     """Delete post - user is author."""
     pass
 
