@@ -172,20 +172,38 @@ def add_comment(request, pk):
         comment.author = request.user
         # В поле birthday передаём объект дня рождения.
         comment.post = post
-        # Сохраняем объект в БД.
         comment.save()
-    # Перенаправляем пользователя назад, на страницу дня рождения.
     return redirect('blog:post_detail', pk=pk) 
 
 
 def edit_comment(request, pk, id):
-    """Edit post by it's author."""
-    pass
+    """Edit comment by it's author."""
+    template_name = 'blog/comment.html'
+    instance = get_object_or_404(Comment, id=id)
+    form = CommentForm(request.POST or None, instance=instance)
+    context = {
+        'form': form
+    }
+    if form.is_valid():
+        form.save()
+        return redirect('blog:post_detail', pk=pk)
+
+    return render(request, template_name, context)
 
 
 def delete_comment(request, pk, id):
     """Delete post - user is author."""
-    pass
+    template_name = 'blog/comment.html'
+    instance = get_object_or_404(Comment, id=id)
+    form = CommentForm(instance=instance)
+    context = {
+        'form': form,
+        'comment': instance
+    }
+    if request.method == 'POST':
+        instance.delete()
+        return redirect('blog:profile', name=request.user)        
+    return render(request, template_name, context)
 
 
 '''
