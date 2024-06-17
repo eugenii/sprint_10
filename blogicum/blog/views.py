@@ -8,7 +8,6 @@ from datetime import datetime
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
-posts_on_page = 5
 user_model = get_user_model()
 
 
@@ -30,7 +29,7 @@ def index(request):
     template_name = 'blog/index.html'
     post_list = post_filter(
         category__is_published=True
-    )  # [:posts_on_page]
+    )
     posts = post_list.order_by('id')
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
@@ -182,7 +181,8 @@ def edit_comment(request, pk, id):
     instance = get_object_or_404(Comment, id=id)
     form = CommentForm(request.POST or None, instance=instance)
     context = {
-        'form': form
+        'form': form,
+        'comment': instance
     }
     if form.is_valid():
         form.save()
@@ -205,22 +205,3 @@ def delete_comment(request, pk, id):
         return redirect('blog:profile', name=request.user)        
     return render(request, template_name, context)
 
-
-'''
-  template_name = 'blog/comment.html'
-    if pk is not None:
-        instance = get_object_or_404(Comment, pk=pk)
-    else:
-        instance = None
-    form = CommentForm(
-        request.POST or None,
-        instance=instance
-    )
-    context = {'form': form}
-    if form.is_valid():
-        instance = form.save(commit=False)
-        instance.author = request.user
-        instance.save()
-        return redirect('blog:profile', name=request.user)
-    return render(request, template_name, context)
-'''
