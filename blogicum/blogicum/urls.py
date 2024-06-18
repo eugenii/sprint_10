@@ -20,6 +20,10 @@ from django.contrib.auth.forms import UserCreationForm
 from django.views.generic.edit import CreateView
 from django.conf import settings
 
+handler403 = 'core.views.csrf_failure'
+handler404 = 'core.views.page_not_found'
+handler500 = 'core.views.custom_error_500'
+
 urlpatterns = [
     path("__debug__/", include("debug_toolbar.urls")),
     path('admin/', admin.site.urls),

@@ -31,7 +31,7 @@ def index(request):
     post_list = post_filter(
         category__is_published=True
     ).annotate(comment_count=Count('comments'))
-    posts = post_list.order_by('id')
+    posts = post_list.order_by('-pub_date')
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -75,7 +75,7 @@ def category_posts(request, category_slug):
     )
     post_list = post_filter(
         category__slug=category_slug
-    ).annotate(comment_count=Count('comments')).order_by('id')
+    ).annotate(comment_count=Count('comments')).order_by('-pub_date')
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -91,7 +91,11 @@ def profile(request, name):
     """Get user's page."""
     template_name = 'blog/profile.html'
     profile = get_object_or_404(User, username=name)
-    posts = Post.objects.filter(author__username=name).annotate(comment_count=Count('comments')).order_by('id')
+    posts = Post.objects.filter(
+        author__username=name
+    ).annotate(
+        comment_count=Count('comments')
+    ).order_by('-pub_date')
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -165,14 +169,10 @@ def delete_post(request, pk):
 @login_required
 def add_comment(request, pk):
     """Comment post by authenticated user."""
-    # Получаем объект дня рождения или выбрасываем 404 ошибку.
     post = get_object_or_404(Post, pk=pk)
-    # Функция должна обрабатывать только POST-запросы.
     form = CommentForm(request.POST)
     if form.is_valid():
-        # Создаём объект поздравления, но не сохраняем его в БД.
         comment = form.save(commit=False)
-        # В поле author передаём объект автора поздравления.
         comment.author = request.user
         # В поле birthday передаём объект дня рождения.
         comment.post = post
@@ -180,6 +180,7 @@ def add_comment(request, pk):
     return redirect('blog:post_detail', pk=pk) 
 
 
+@login_required
 def edit_comment(request, pk, id):
     """Edit comment by it's author."""
     template_name = 'blog/comment.html'

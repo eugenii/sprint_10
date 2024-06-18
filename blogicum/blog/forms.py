@@ -9,9 +9,7 @@ User = get_user_model()
 class UserForm(forms.ModelForm):
     
     class Meta:
-        # Указываем модель, на основе которой должна строиться форма.
         model = User
-        # Указываем, что надо отобразить все поля.
         fields = ('first_name', 'last_name', 'username', 'email')
 
 
@@ -23,7 +21,6 @@ class PostForm(forms.ModelForm):
         widgets = {
             'pub_date': forms.DateInput(attrs={'type': 'date'})
         }
-        # Указываем, что надо отобразить все поля.
         exclude = ('author',)
 
 
