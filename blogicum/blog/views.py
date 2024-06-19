@@ -180,11 +180,13 @@ def add_comment(request, pk):
     return redirect('blog:post_detail', pk=pk) 
 
 
-@login_required
+# @login_required
 def edit_comment(request, pk, id):
     """Edit comment by it's author."""
     template_name = 'blog/comment.html'
     instance = get_object_or_404(Comment, id=id)
+    if instance.author != request.user:
+        return redirect('login')
     form = CommentForm(request.POST or None, instance=instance)
     context = {
         'form': form,
@@ -201,6 +203,8 @@ def delete_comment(request, pk, id):
     """Delete post - user is author."""
     template_name = 'blog/comment.html'
     instance = get_object_or_404(Comment, id=id)
+    if instance.author != request.user:
+        return redirect('login')
     # form = CommentForm(instance=instance)
     context = {
         # 'form': form
