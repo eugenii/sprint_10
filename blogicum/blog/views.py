@@ -201,9 +201,9 @@ def delete_comment(request, pk, id):
     """Delete post - user is author."""
     template_name = 'blog/comment.html'
     instance = get_object_or_404(Comment, id=id)
-    form = CommentForm(instance=instance)
+    # form = CommentForm(instance=instance)
     context = {
-        'form': form,
+        # 'form': form
         'comment': instance
     }
     if request.method == 'POST':
