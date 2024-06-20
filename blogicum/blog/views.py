@@ -40,7 +40,6 @@ def index(request):
         'posts': posts,
         'page_obj': page_obj
     }
-    # x = Comment.objects.filter(post_id=49).count()
     return render(request, template_name, context)
 
 
@@ -143,13 +142,15 @@ def edit_post(request, pk):
     """Edit post, authered by user."""
     template_name = 'blog/create.html'
     instance = get_object_or_404(Post, pk=pk)
+    if instance.author != request.user:
+        return redirect('blog:post_detail', pk=pk)
     form = PostForm(request.POST or None, instance=instance)
     context = {
         'form': form
     }
     if form.is_valid():
         form.save()
-        return redirect('blog:post_detail', id=pk)
+        return redirect('blog:post_detail', pk=pk)
 
     return render(request, template_name, context)
 
@@ -158,6 +159,8 @@ def delete_post(request, pk):
     """Delete post if user is author."""
     template_name = 'blog/create.html'
     instance = get_object_or_404(Post, pk=pk)
+    if instance.author != request.user:
+        return redirect('blog:post_detail', pk=pk)
     form = PostForm(instance=instance)
     context = {'form': form}
     if request.method == 'POST':
